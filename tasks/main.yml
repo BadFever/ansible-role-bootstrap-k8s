@@ -11,3 +11,16 @@
     state: "{{ item.state | default('present') }}"
   notify: restart kubelet
   with_items: "{{ kubernetes_packages }}"
+
+- include_tasks: kubelet-setup.yml
+
+- name: Ensure kubelet is started and enabled at boot.
+  service:
+    name: kubelet
+    state: started
+    enabled: true
+
+- name: Check if Kubernetes has already been initialized.
+  stat:
+    path: /etc/kubernetes/admin.conf
+  register: kubernetes_init_stat
